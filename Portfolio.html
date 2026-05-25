@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jérémy Savard — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Design tokens ── */
+    :root {
+      --cream:   #f5ede4;
+      --blush:   #e8d0c0;
+      --terracotta: #c17f5e;
+      --sage:    #8a9e8c;
+      --dark:    #2a2219;
+      --mid:     #7a6a58;
+      --light-text: #9e8e80;
+      --card-bg: #faf4ef;
+      --section-gap: 120px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.zoom-img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  cursor: zoom-in;
+  transition: opacity .2s;
+}
+
+.zoom-img:hover {
+  opacity: 0.9;
+}
+
+/* Overlay */
+#zoom-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.75);
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+#zoom-overlay.active {
+  display: flex;
+}
+
+#zoom-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+}
+
+    html { scroll-behavior: smooth; 
+            overflow-x: hidden;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--dark);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(245, 237, 228, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(193,127,94,.15);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--dark);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: .82rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--mid);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--terracotta); }
+
+    /* ── Blob decorations ── */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: .55;
+    }
+
+    /* ── Profil ── */
+    #Profil {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 8vw 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .Profil-blob-1 {
+      width: 320px; height: 320px;
+      background: var(--blush);
+      top: 60px; left: -80px;
+    }
+    .Profil-blob-2 {
+      width: 180px; height: 180px;
+      background: var(--terracotta);
+      opacity: .25;
+      bottom: 120px; right: 6vw;
+    }
+    .Profil-blob-3 {
+      width: 110px; height: 110px;
+      background: var(--sage);
+      opacity: .4;
+      top: 80px; right: 18vw;
+    }
+    .Profil-inner {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1100px;
+      position: relative;
+      z-index: 1;
+    }
+    .Profil-photo-wrap {
+      position: relative;
+    }
+    .Profil-photo-oval {
+      width: 300px; height: 380px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid rgba(193,127,94,.3);
+    }
+    .Profil-photo-oval img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    /* Placeholder when no real photo */
+    .Profil-photo-placeholder {
+      width: 300px; height: 380px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blush) 0%, var(--terracotta) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      color: rgba(255,255,255,.7);
+      border: 3px solid rgba(193,127,94,.3);
+    }
+    .Profil-text h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+    .Profil-text h1 span { color: var(--terracotta); }
+    .Profil-text p {
+      color: var(--mid);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-bottom: 16px;
+    }
+    .Profil-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 32px;
+    }
+    .tag {
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid var(--terracotta);
+      color: var(--terracotta);
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Section base ── */
+    section { 
+      position: relative; 
+      overflow: visible;
+    }
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--section-gap) 8vw;
+      overflow: visible;
+    }
+
+    /* ── Section headers ── */
+    .section-label {
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 48px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--blush), transparent);
+      margin: 0 8vw;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 40px;
+      border: 1px solid rgba(193,127,94,.12);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(42,34,25,.08);
+    }
+    .card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 16px;
+      color: var(--dark);
+    }
+    .card p { color: var(--mid); font-size: .95rem; }
+
+    /* ── Two-col layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    /* ── Split layout (text + aside) ── */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .split.reverse { grid-template-columns: 1.1fr 1fr; }
+    .split-text { }
+    .split-aside {
+      position: sticky;
+      top: 100px;
+    }
+
+    /* ── Links ── */
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--terracotta);
+      color: #fff;
+      border-radius: 40px;
+      text-decoration: none;
+      font-size: .85rem;
+      letter-spacing: .05em;
+      transition: opacity .2s, transform .2s;
+      margin-top: 20px;
+      margin-right: 10px;
+    }
+    .link-pill:hover { opacity: .88; transform: translateY(-1px); }
+    .link-pill.outline {
+      background: transparent;
+      border: 1.5px solid var(--terracotta);
+      color: var(--terracotta);
+    }
+
+    /* ── Tools list ── */
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .tool-chip {
+      padding: 5px 14px;
+      background: rgba(138,158,140,.18);
+      color: var(--sage);
+      border-radius: 6px;
+      font-size: .78rem;
+      letter-spacing: .06em;
+    }
+
+    /* ── Profil wave ── */
+    .wave-divider {
+      display: block;
+      width: 100%;
+      height: 60px;
+    }
+
+    /* ── Section: audiovisuel ── */
+    #audiovisuel { background: var(--card-bg); }
+
+    /* ── Section: gestion-communauté ── */
+    #gestion { background: var(--cream); }
+
+    /* ── Section: Gestion-Evenementiel ── */
+    #gestion-evenementiel { background: var(--card-bg); }
+
+    /* ── Section: redaction ── */
+    #redaction { background: var(--cream); overflow: visible;
+                overflow: visible;
+                overflow-x: visible;
+                overflow-y: visible;
+                overflow-clip-margin: 0;
+    }
+
+    /* ── Section: radio ── */
+    #radio { background: var(--card-bg);
+             overflow: visible;
+             overflow-x: visible;
+             overflow-y: visible;
+             overflow-clip-margin: 0;
+            }
+
+    /* ── Article cards ── */
+    .article-card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid rgba(193,127,94,.15);
+      transition: transform .25s ease, box-shadow .25s ease;
+      overflow: visible;
+    }
+    .article-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(42,34,25,.06);
+    }
+    .article-card .eyebrow {
+      font-size: .7rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 10px;
+    }
+    .article-card h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .article-card p { font-size: .88rem; color: var(--mid); }
+    .article-card a {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--terracotta);
+      font-size: .82rem;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(193,127,94,.4);
+    }
+    .article-card a:hover { border-color: var(--terracotta); }
+
+    /* ── Shopify mockup ── */
+    .shopify-screens {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .screen {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(193,127,94,.2);
+      background: #fff;
+    }
+    .screen-bar {
+      background: var(--blush);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .screen-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+    }
+    .screen-body {
+      padding: 20px 16px;
+      font-size: .82rem;
+      color: var(--mid);
+      min-height: 120px;
+    }
+    .screen-body strong {
+      display: block;
+      font-size: .95rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    /* ── Event blocks ── */
+    .event-block {
+      border-left: 3px solid var(--terracotta);
+      padding-left: 20px;
+      margin-bottom: 28px;
+    }
+    .event-block h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+    .event-block p { color: var(--mid); font-size: .9rem; }
+
+    /* ── Radio cards ── */
+    .radio-card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid rgba(193,127,94,.15);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .radio-card .icon { font-size: 1.6rem; }
+    .radio-card h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+    .radio-card p { font-size: .88rem; color: var(--mid); }
+    .radio-card a {
+      margin-top: 6px;
+      color: var(--terracotta);
+      font-size: .82rem;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(193,127,94,.4);
+      width: fit-content;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.55);
+      text-align: center;
+      padding: 48px 8vw;
+      font-size: .82rem;
+      letter-spacing: .05em;
+    }
+    footer span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.8);
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    /* ── Animations ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 800px) {
+      nav { padding: 14px 24px; }
+      .nav-links { gap: 20px; }
+      .Profil-inner { grid-template-columns: 1fr; gap: 40px; }
+      .Profil-photo-oval, .Profil-photo-placeholder { width: 220px; height: 280px; margin: 0 auto; }
+      .split, .split.reverse { grid-template-columns: 1fr; }
+      .two-col, .three-col { grid-template-columns: 1fr; }
+      .shopify-screens { grid-template-columns: 1fr; }
+      .split-aside { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav>
+    <a class="nav-logo" href="#Profil">Jérémy Savard</a>
+    <ul class="nav-links">
+      <li><a href="#audiovisuel">Audiovisuel</a></li>
+      <li><a href="#gestion">Communauté</a></li>
+      <li><a href="#gestion-evenementiel">Gestion Évènementielle</a></li>
+      <li><a href="#redaction">Rédaction</a></li>
+      <li><a href="#radio">Radio</a></li>
+    </ul>
+  </nav>
+  <div id="zoom-overlay">
+    <img id="zoom-overlay-img" src="" alt="" />
+  </div>
+  <!-- ── Profil ── -->
+  <section id="Profil">
+    <div class="blob Profil-blob-1"></div>
+    <div class="blob Profil-blob-2"></div>
+    <div class="blob Profil-blob-3"></div>
+
+    <div class="Profil-inner">
+      <div class="Profil-photo-wrap fade-up">
+        <img src="moi.jpg" alt="Jérémy Savard" class="Profil-photo-placeholder"></div>
+      </div>
+
+      <div class="Profil-text fade-up" style="transition-delay:.15s">
+        <p class="section-label">Portfolio</p>
+        <h1>Bonjour,<br/>je me présente <span>Jérémy</span><br/>Savard.</h1>
+        <p>
+          Professionnel diplômé en études politiques appliquées et en
+          communication à l'Université de Sherbrooke. Passionné par les
+          défis et animé par un désir constant de dépassement, je cherche
+          à mettre mes compétences au service de projets porteurs de sens.
+        </p>
+        <p>
+          Grâce à des expériences professionnelles variées, j'ai eu
+          l'occasion de développer ma capacité d'adaptation et mon sens
+          de la collaboration, contribuant activement au changement et à
+          l'amélioration des organisations au sein desquelles j'ai travaillé.
+        </p>
+        <div class="Profil-tags">
+          <span class="tag">Entregent</span>
+          <span class="tag">Sens de l'initiative</span>
+          <span class="tag">Dynamique</span>
+        </div>
+         <div class="Profil-tags">
+          <span class="tag">Débrouillard</span>
+          <span class="tag">Versatile</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Production audiovisuelle ── -->
+  <section id="audiovisuel">
+    <div class="section-inner">
+      <p class="section-label fade-up">Production</p>
+      <h2 class="section-title fade-up">Production<br/>audiovisuelle</h2>
+
+      <div class="split fade-up">
+        <div class="split-text">
+          <div class="card">
+            <h3>Production d'un balado</h3>
+            <p>
+              J'ai conçu et réalisé un balado de A à Z, en assurant
+              l'ensemble du processus créatif et technique : identité
+              visuelle, montage sonore et rendu professionnel. Cette
+              expérience m'a permis de développer mes compétences avec des
+              logiciels tels que DaVinci Resolve, CapCut et Adobe Audition.
+            </p>
+            <div class="tools">
+              <span class="tool-chip">DaVinci Resolve</span>
+              <span class="tool-chip">CapCut</span>
+              <span class="tool-chip">Adobe Audition</span>
+              <span class="tool-chip">OBS</span>
+            </div>
+            <div>
+              <a class="link-pill" href="http://www.youtube.com/@LaGameDansGame" target="_blank" rel="noopener">
+                ▶ Sur YouTube
+              </a>
+              <a class="link-pill outline" href="https://open.spotify.com/show/2PDWSGqxeRGkLXlb3soHmK?si=18291f467a384150" target="_blank" rel="noopener">
+                ♫ Sur Spotify
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="split-aside">
+          <!-- Clip 1 -->
+          <video controls viewBox="0 0 480 320" src="Clip.mp4" style="width:100%;border-radius:20px;background:#faf4ef;border:1px solid rgba(193,127,94,.15)">
+              Votre navigateur ne supporte pas la lecture de vidéos.
+          </video>
+          <!-- Clip 2 -->
+          <video controls viewBox="0 0 480 320" src="clip format tiktok.mp4" style="width:60%;border-radius:20px;background:#faf4ef;border:1px solid rgba(193,127,94,.15)">
+              Votre navigateur ne supporte pas la lecture de vidéos.
+          </video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Gestion de communauté en ligne ── -->
+  <section id="gestion">
+    <div class="section-inner">
+      <p class="section-label fade-up">MEYEUR</p>
+      <h2 class="section-title fade-up">Gestion de communauté<br/>en ligne</h2>
+
+    <div class="two-col">
+      <div class="card fade-up" style="height: 50%;">
+        <h3>Pilier de contenu </h3>
+        <p>
+            L'un des piliers de contenu développés dans le cadre du plan de
+            communication conçu pour MEYEUR. Ce concept met de l'avant la
+            polyvalence et la spontanéité de la marque en démontrant comment
+            ses jeux s'intègrent naturellement à une multitude de contextes.
+        </p>
+      </div>
+      <div class="card fade-up" style="width:135%; padding:20px; background:rgba(193,127,94,.08); border-radius:12px;">
+        <p style="font-size:.88rem;"> <img src="COM132_STRAT_page-0001.jpg" style="width:100%;" />
+        </p>
+      </div>
+    </div>
+        <div class="card fade-up" style=" width:930px;transition-delay:.1s; margin-top:32px;">
+          <h3>Calendrier de contenu</h3>
+          <p>
+            Le calendrier de contenu conçu dans le cadre du mandat pour MEYEUR
+            visait à optimiser la gestion de ses médias sociaux en renforçant
+            sa stratégie de contenu organique et en réduisant sa dépendance aux
+            campagnes publicitaires payantes.
+          </p>
+          <div style= "margin-top:24px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <img src="calendrier_de_contenu_meyeur_page-0001.jpg" style="width: 850px;" />
+          </div>
+        </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Gestion & Évènementiel ── -->
+  <section id="gestion-evenementiel">
+    <div class="section-inner">
+      <p class="section-label fade-up">Microbrasserie</p>
+      <h2 class="section-title fade-up">Gestion<br/>et évènementiel</h2>
+
+      <div class="split fade-up">
+        <div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin-bottom:20px;">Boutique en ligne</h3>
+          <p style="color:var(--mid);margin-bottom:20px;">
+            Lors de mon emploi à la microbrasserie Siboire, j'ai assuré le bon
+            fonctionnement de la boutique en ligne via Shopify. Mes responsabilités
+            comprenaient la gestion de la disponibilité et de la création des produits,
+            l'association des balises, l'administration des métadonnées permettant
+            l'intégration des descriptions d'Untappd, et la mise en place d'automatisations
+            pour les consignes et les escomptes.
+          </p>
+          <div class="tools">
+            <span class="tool-chip">Shopify</span>
+            <span class="tool-chip">Untappd</span>
+            <span class="tool-chip">SEO / Métadonnées</span>
+          </div>
+          <a class="link-pill" href="https://siboire.ca/fr/boutique/" target="_blank" rel="noopener" style="margin-top:24px;">
+            Voir le site web →
+          </a>
+        </div>
+          <div class="Profil-photo-wrap fade-up"style="width:150%;height:100%;margin-top:32px;transition-delay:.1s;">
+            <img src="moibaril34.jpg" alt="Jérémy Savard" class="Profil-photo-placeholder"></div>
+          </div>
+      </div>
+      <div>
+        <div class="shopify-screens"style="margin-top:32px;transition-delay:.1s;display: flex;flex-wrap:wrap;justify-content:center;">
+          <div class="screen"style="width:930px;height:600px;">
+            <div class="screen-bar">
+              <div class="screen-dot" style="background:#e87c6a;"></div>
+              <div class="screen-dot" style="background:#e8c96a;"></div>
+              <div class="screen-dot" style="background:#6ae87c;"></div>
+            </div>
+            <div class="screen-body">
+              <iframe src="https://siboire.ca/fr/boutique/" title="Accueil" frameborder="0" allowfullscreen style="width:900px;height:540px;border:none;"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="section-inner">
+      <div style="margin-top:64px;" class="fade-up">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin-bottom:32px;">Gestion d'évènement</h3>
+        <div class="two-col">
+        <div class="event-block">
+            <h4>Presta Ride</h4>
+            <p>
+              J'assurais la gestion du bon déroulement des évènements Presta Ride
+              se déroulant directement à la boutique. Cela comprenait la gestion
+              du personnel, de l'inventaire, du montage/démontage et de l'expérience client.
+            </p>
+            <a class="link-pill outline" href="https://www.instagram.com/reel/DYQQEtOIK72/" target="_blank" rel="noopener" style="margin-top:16px;font-size:.8rem;">
+              ▶ Vidéo Presta Ride
+            </a>
+          </div>
+          <div>
+             <video controls viewBox="0 0 480 320" src="prestaride.mp4" style="width:50%;border-radius:20px;background:#faf4ef;border:1px solid rgba(193,127,94,.15);margin-top:16px;">
+              Votre navigateur ne supporte pas la lecture de vidéos.
+              </video>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="event-block">
+            <h4>Beer Run</h4>
+            <p>
+              Coordination et supervision des Beer Run organisés en boutique.
+              Gestion du personnel, de l'inventaire et de l'expérience client
+              pour garantir des évènements mémorables.
+            </p>
+            <a class="link-pill outline" href="https://www.instagram.com/reel/DXfaaI4kRUP/" target="_blank" rel="noopener" style="margin-top:16px;font-size:.8rem;">
+              ▶ Vidéo Beer Run
+            </a>
+          </div>
+          <div>
+             <video controls viewBox="0 0 480 320" src="beerrun.mp4" style="width:50%;border-radius:20px;background:#faf4ef;border:1px solid rgba(193,127,94,.15);margin-top:16px;">
+              Votre navigateur ne supporte pas la lecture de vidéos.
+              </video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Rédaction ── -->
+  <section id="redaction">
+    <div class="section-inner">
+      <p class="section-label fade-up">Journalisme</p>
+      <h2 class="section-title fade-up">Rédaction</h2>
+
+      <p style="color:var(--mid);max-width:600px;margin-bottom:48px;" class="fade-up">
+        Plusieurs articles rédigés en tant que collaborateur et stagiaire
+        pour le Journal <em>Le Collectif</em>.
+      </p>
+      <div style="display:flex;flex-warp:wrap;gap:28px;">
+
+        <div class="article-card fade-up" style="width: 300px;">
+          <div class="eyebrow">Le Collectif — Critique cinéma</div>
+          <h4>Je verrai toujours vos visages</h4>
+          <div zoom-container>
+            <img src="JeverraiToujoursVosVisages_pages-to-jpg-0001.jpg" class="zoom-img" alt="Affiche du film Je verrai toujours vos visages" style="width:100%;border-radius:12px;margin-bottom:16px;">
+          </div>
+          <a href="https://www.calameo.com/read/004803228679d4083b99e?trackersource=library" target="_blank" rel="noopener">Lire l'article →</a>
+        </div>
+      
+        <div class="article-card fade-up" style="width: 300px; height: 388px; transition-delay:.1s">
+          <div class="eyebrow">Le Collectif — Culture</div>
+          <h4>Akila Aggoune pour «&nbsp;Investir en faveur des femmes&nbsp;»</h4>
+          <div zoom-container>
+           <img src="AggouneEntrevue_page-0001.jpg" class="zoom-img" alt="Photo d'Akila Aggoune lors de sa conférence à l'UdeS" style="width:100%;border-radius:12px;margin-bottom:16px;">
+          </div>
+          <a href="https://www.calameo.com/read/004803228041cf7dbaed9?trackersource=library" target="_blank" rel="noopener">Lire l'article →</a>
+        </div>
+
+      </div>
+      <div style="display:flex;flex-warp:wrap;gap:28px; margin-top:32px;">
+        <div class="article-card fade-up" style="width: 300px;transition-delay:.2s">
+          <div class="eyebrow">Le Collectif — Littérature</div>
+          <h4>Plessis, par Joël Bégin</h4>
+          <div zoom-container>
+            <img src="Plessis_page-0001.jpg" class="zoom-img" alt="Couverture du roman Plessis" style="width:100%;border-radius:12px;margin-bottom:16px;">
+          </div>
+          <a href="https://www.calameo.com/read/004803228a8feccfe129a?trackersource=library" target="_blank" rel="noopener">Lire l'article →</a>
+        </div>
+
+        <div class="article-card fade-up" style="width: 300px;transition-delay:.3s">
+          <div class="eyebrow">Le Collectif — Politique internationale</div>
+          <h4>Le Phœnix de l'impérialisme américain</h4>
+          <div zoom-container>
+            <img src="phoeniximperialismeamericain.jpg" class="zoom-img" alt="Image d'illustration de l'article sur le Phœnix de l'impérialisme américain" style="width:100%;border-radius:12px;margin-bottom:16px;">
+          </div>
+          <a href="https://www.calameo.com/read/0048032288b4988c6d3d2?trackersource=library" target="_blank" rel="noopener">Lire l'article →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── Radio — CFAK 88.3 FM ── -->
+  <section id="radio">
+    <div class="section-inner">
+      <p class="section-label fade-up">Radiodiffusion</p>
+      <h2 class="section-title fade-up">Chroniques à<br/>CFAK 88.3 FM</h2>
+
+      <div class="three-col">
+        <div class="radio-card fade-up"style="height: 388px">
+          <div class="icon">📻</div>
+          <h4>Chronique sur l'extrême droite</h4>
+          <p>
+            Analyse de la montée des mouvements d'extrême droite, diffusée
+            sur les ondes de CFAK 88.3 FM.
+          </p>
+          <audio controls src="Le NEUF - C'est quoi de l'extrême droite (JAY) - 04 février 2025.mp3" style="width:100%;border-radius:12px;background:#faf4ef;border:1px solid rgba(193,127,94,.15);margin-top:16px;">
+              Votre navigateur ne supporte pas la lecture de l'audio.
+          </audio>
+          <a href="https://le-sept.castos.com/episodes/le-neuf-cest-quoi-de-lextreme-droite-jay-04-fevrier-2025" target="_blank" rel="noopener">Source CFAK →</a>        
+        </div>
+
+        <div class="radio-card fade-up" style="transition-delay:.1s">
+          <div class="icon">🎙️</div>
+          <h4>Capsule sur les clivages politiques</h4>
+          <video controls viewBox="0 0 480 320" src="CFAKClivages.mp4" style="width:100%;border-radius:12px;background:#faf4ef;border:1px solid rgba(193,127,94,.15);margin-top:16px;">
+              Votre navigateur ne supporte pas la lecture de vidéos.
+          </video>
+          <a href="https://www.instagram.com/reel/DUbQiyZlYn3/" target="_blank" rel="noopener">Source CFAK →</a>
+        </div>
+
+        <div class="radio-card fade-up" style="transition-delay:.2s ; height: 388px">
+          <div class="icon">🎤</div>
+          <h4>Entrevue avec Sonia Bolduc</h4>
+          <p>
+            Entrevue réalisée à l'occasion de la sortie du recueil de Sonia Bolduc :
+            <em>On exclut la personne qui parle</em>.
+          </p>
+          <audio controls src="Le Douze - Sonia Bolduc nous présente  On exclut la personne qui parle - 07 avril.mp3" style="width:100%;border-radius:12px;background:#faf4ef;border:1px solid rgba(193,127,94,.15);margin-top:16px;">
+              Votre navigateur ne supporte pas la lecture de l'audio.
+          </audio>
+          <a href="https://le-douze.castos.com/episodes/le-douze-sonia-bolduc-nous-presente-on-exclut-la-personne-qui-parle-07-avril" target="_blank" rel="noopener">Source CFAK →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <span>Jérémy Savard</span>
+    Études politiques appliquées & Communication — Université de Sherbrooke<br/>
+    <br/>
+    © 2026 Jérémy Savard — Portfolio
+  </footer>
+
+  <!-- ── Intersection Observer for fade-up ── -->
+  <script>
+    // Intersection observer
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Zoom overlay
+const overlay = document.getElementById('zoom-overlay');
+const overlayImg = document.getElementById('zoom-overlay-img');
+
+document.querySelectorAll('.zoom-img').forEach(img => {
+  img.addEventListener('click', () => {
+    overlayImg.src = img.src;
+    overlayImg.alt = img.alt;
+    overlay.classList.add('active');
+  });
+});
+
+overlay.addEventListener('click', () => {
+  overlay.classList.remove('active');
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') overlay.classList.remove('active');
+});
+  </script>
+</body>
+</html>
